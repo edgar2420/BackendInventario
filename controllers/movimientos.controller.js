@@ -6,7 +6,7 @@ exports.crearMovimiento = async (req, res) => {
     componente_codigo = '',
     tipo = '',
     cantidad,
-    persona_id,
+    persona_id, // Puede ser ID (salida) o nombre libre (entrada)
     unidad_proceso_id,
     orden_tipo = '',
     orden_numero = '',
@@ -31,6 +31,7 @@ exports.crearMovimiento = async (req, res) => {
   if (tipoMov === 'entrada' && !persona_id) {
     return res.status(400).json({ error: 'Debe indicar persona que entrega' })
   }
+
   if (tipoMov === 'salida') {
     if (!persona_id || !unidad_proceso_id || !orden_tipo || !orden_numero) {
       return res.status(400).json({ error: 'Faltan datos requeridos para salida' })
@@ -46,8 +47,8 @@ exports.crearMovimiento = async (req, res) => {
       tipo: tipoMov,
       cantidad: Number(cantidad),
       observaciones: motivo.trim(),
-      persona_entrega_id: tipoMov === 'entrada' ? persona_id : null,
-      persona_responsable_id: tipoMov === 'salida' ? persona_id : null,
+      persona_entrega_nombre: tipoMov === 'entrada' ? persona_id : null, // string libre
+      persona_responsable_id: tipoMov === 'salida' ? persona_id : null,  // FK
       unidad_proceso_id: tipoMov === 'salida' ? unidad_proceso_id : null,
       orden_trabajo: tipoMov === 'salida' ? `${orden_tipo}-${orden_numero}` : null
     }
@@ -82,7 +83,6 @@ exports.obtenerMovimientos = async (req, res) => {
         *,
         componente:componentes(nombre),
         responsable:personas!persona_responsable_id(nombre),
-        entrega:personas!persona_entrega_id(nombre),
         unidad:unidad_proceso(nombre)
       `)
       .order('fecha', { ascending: false })
@@ -96,7 +96,7 @@ exports.obtenerMovimientos = async (req, res) => {
       ...m,
       nombre_componente: m.componente?.nombre || null,
       persona_responsable: m.responsable?.nombre || null,
-      persona_entrega: m.entrega?.nombre || null,
+      persona_entrega: m.persona_entrega_nombre || null, // directamente el campo libre
       unidad_proceso: m.unidad?.nombre || null
     }))
 
@@ -122,7 +122,6 @@ exports.obtenerMovimientoPorComponente = async (req, res) => {
         *,
         componente:componentes(nombre),
         responsable:personas!persona_responsable_id(nombre),
-        entrega:personas!persona_entrega_id(nombre),
         unidad:unidad_proceso(nombre)
       `)
       .eq('componente_codigo', codigo)
@@ -137,7 +136,7 @@ exports.obtenerMovimientoPorComponente = async (req, res) => {
       ...m,
       nombre_componente: m.componente?.nombre || null,
       persona_responsable: m.responsable?.nombre || null,
-      persona_entrega: m.entrega?.nombre || null,
+      persona_entrega: m.persona_entrega_nombre || null,
       unidad_proceso: m.unidad?.nombre || null
     }))
 
