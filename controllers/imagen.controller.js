@@ -13,7 +13,7 @@ const subirImagen = async (req, res) => {
     const nombreArchivo = `${uuidv4()}${path.extname(archivo.name)}`
     const rutaTemporal = archivo.tempFilePath
 
-    // DEBUG
+    
     console.log(' Nombre archivo:', nombreArchivo)
     console.log(' Ruta temporal:', rutaTemporal)
 
