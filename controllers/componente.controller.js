@@ -14,7 +14,7 @@ const obtenerComponentes = async (req, res) => {
 
   if (error) {
     console.error('Error al obtener componentes:', error)
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json({ error: 'Error al obtener componentes' })
   }
 
   res.json(data)
@@ -53,13 +53,13 @@ const agregarComponente = async (req, res) => {
 
     if (error) {
       console.error('Error al crear componente:', error)
-      return res.status(500).json({ error: error.message })
+      return res.status(500).json({ error: 'Error al crear componente' })
     }
 
     res.status(201).json(data[0])
   } catch (error) {
     console.error('Error inesperado al crear componente:', error)
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: 'Error inesperado al crear componente' })
   }
 }
 
@@ -74,7 +74,7 @@ const eliminarComponente = async (req, res) => {
 
   if (error) {
     console.error('Error al eliminar componente:', error)
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json({ error: 'Error al eliminar componente' })
   }
 
   res.json({ msg: 'Componente eliminado correctamente' })
@@ -95,7 +95,6 @@ const editarComponente = async (req, res) => {
   } = req.body
 
   try {
-    // Validar existencia de clase y tipo (ambos requeridos)
     const claseResp = await supabase.from('clase').select('id').eq('id', clase_id).single()
     const tipoResp = await supabase.from('tipo').select('id').eq('id', tipo_id).single()
 
@@ -121,16 +120,15 @@ const editarComponente = async (req, res) => {
 
     if (error) {
       console.error('Error al editar componente:', error)
-      return res.status(500).json({ error: error.message })
+      return res.status(500).json({ error: 'Error al editar componente' })
     }
 
     res.json({ msg: 'Componente actualizado correctamente' })
   } catch (err) {
     console.error('Error inesperado en editarComponente:', err)
-    res.status(500).json({ error: err.message })
+    res.status(500).json({ error: 'Error inesperado al editar componente' })
   }
 }
-
 
 // Obtener un componente por su código
 const obtenerComponentePorCodigo = async (req, res) => {
@@ -147,6 +145,7 @@ const obtenerComponentePorCodigo = async (req, res) => {
     .single()
 
   if (error) {
+    console.error('Error al obtener componente:', error)
     return res.status(404).json({ error: 'Componente no encontrado' })
   }
 
@@ -160,3 +159,4 @@ module.exports = {
   editarComponente,
   obtenerComponentePorCodigo
 }
+
