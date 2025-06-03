@@ -8,8 +8,7 @@ const obtenerComponentes = async (req, res) => {
     .select(`
       *,
       clase:clase_id(nombre),
-      tipo:tipo_id(nombre),
-      unidad_proceso:unidad_proceso_id(nombre)
+      tipo:tipo_id(nombre)
     `)
     .order('created_at', { ascending: false })
 
@@ -21,7 +20,6 @@ const obtenerComponentes = async (req, res) => {
   res.json(data)
 }
 
-
 // Agregar nuevo componente
 const agregarComponente = async (req, res) => {
   try {
@@ -30,10 +28,8 @@ const agregarComponente = async (req, res) => {
       descripcion,
       modelo,
       marca,
-      fabricante,
       cantidad,
       imagen_url,
-      unidad_proceso_id,
       clase_id,
       tipo_id
     } = req.body
@@ -48,10 +44,8 @@ const agregarComponente = async (req, res) => {
         descripcion,
         modelo,
         marca,
-        fabricante,
         cantidad,
         imagen_url,
-        unidad_proceso_id,
         clase_id,
         tipo_id
       }])
@@ -89,20 +83,54 @@ const eliminarComponente = async (req, res) => {
 // Editar componente por código
 const editarComponente = async (req, res) => {
   const { codigo } = req.params
-  const camposActualizados = req.body
+  const {
+    nombre,
+    descripcion,
+    modelo,
+    marca,
+    cantidad,
+    imagen_url,
+    clase_id,
+    tipo_id
+  } = req.body
 
-  const { error } = await supabase
-    .from('componentes')
-    .update(camposActualizados)
-    .eq('codigo', codigo)
+  try {
+    // Validar existencia de clase y tipo (ambos requeridos)
+    const claseResp = await supabase.from('clase').select('id').eq('id', clase_id).single()
+    const tipoResp = await supabase.from('tipo').select('id').eq('id', tipo_id).single()
 
-  if (error) {
-    console.error('Error al editar componente:', error)
-    return res.status(500).json({ error: error.message })
+    if (!claseResp.data || !tipoResp.data) {
+      return res.status(400).json({ error: 'Clase o tipo no encontrados' })
+    }
+
+    const camposActualizados = {
+      nombre,
+      descripcion,
+      modelo,
+      marca,
+      cantidad,
+      imagen_url,
+      clase_id,
+      tipo_id
+    }
+
+    const { error } = await supabase
+      .from('componentes')
+      .update(camposActualizados)
+      .eq('codigo', codigo)
+
+    if (error) {
+      console.error('Error al editar componente:', error)
+      return res.status(500).json({ error: error.message })
+    }
+
+    res.json({ msg: 'Componente actualizado correctamente' })
+  } catch (err) {
+    console.error('Error inesperado en editarComponente:', err)
+    res.status(500).json({ error: err.message })
   }
-
-  res.json({ msg: 'Componente actualizado correctamente' })
 }
+
 
 // Obtener un componente por su código
 const obtenerComponentePorCodigo = async (req, res) => {
@@ -113,8 +141,7 @@ const obtenerComponentePorCodigo = async (req, res) => {
     .select(`
       *,
       clase:clase_id(nombre),
-      tipo:tipo_id(nombre),
-      unidad_proceso:unidad_proceso_id(nombre)
+      tipo:tipo_id(nombre)
     `)
     .eq('codigo', codigo)
     .single()
@@ -125,7 +152,6 @@ const obtenerComponentePorCodigo = async (req, res) => {
 
   res.json(data)
 }
-
 
 module.exports = {
   obtenerComponentes,
