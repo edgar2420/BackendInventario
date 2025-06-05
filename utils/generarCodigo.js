@@ -18,7 +18,7 @@ const generarCodigo = async (clase_id, tipo_id) => {
     throw new Error('Clase o tipo no encontrados')
   }
 
-  const claseAbrev = claseData.nombre.trim().toUpperCase().substring(0, 2)
+  const claseAbrev = claseData.nombre.trim().toUpperCase().substring(0, 3)
   const tipoAbrev = tipoData.nombre.trim().toUpperCase().substring(0, 3)
   const prefijo = `${claseAbrev}-${tipoAbrev}`
 
@@ -41,3 +41,4 @@ const generarCodigo = async (clase_id, tipo_id) => {
 }
 
 module.exports = { generarCodigo }
+
